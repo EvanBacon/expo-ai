@@ -1,5 +1,4 @@
 import { ChatContainer } from "@/components/chat-container";
-// import { MapCard, MapSkeleton } from "@/components/map/map-card";
 import { MoviesCard, MoviesSkeleton } from "@/components/movies/movie-card";
 import { WeatherCard } from "@/components/weather";
 import { ScrollView } from "react-native";
@@ -18,11 +17,6 @@ export default function Storybook() {
           city="Austin"
           data={require("@/fixtures/weather-austin.json")}
         />
-        {/* <MapSkeleton />
-        <MapCard
-          city={"Las Vegas"}
-          data={require("@/fixtures/locations-vegas.json")}
-        /> */}
       </ScrollView>
     </ChatContainer>
   );

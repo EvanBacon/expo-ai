@@ -2,6 +2,7 @@ import Stack from "@/components/ui/Stack";
 import TouchableBounce from "@/components/ui/TouchableBounce";
 import * as AC from "@bacons/apple-colors";
 import * as AppIcon from "expo-quick-actions/icon";
+import React from "react";
 import { Image, ScrollView, useColorScheme, View } from "react-native";
 
 import MaskedView from "@react-native-masked-view/masked-view";
@@ -30,6 +31,7 @@ export default function Page() {
       <Stack.Screen
         options={{
           title: "App Icon",
+          // @ts-expect-error
           headerLargeStyle: {
             backgroundColor: AC.systemBackground,
           },
@@ -98,6 +100,7 @@ export default function Page() {
               >
                 <Image
                   source={isDark ? darkIcon : icon}
+                  // @ts-expect-error
                   style={{
                     borderRadius: 20,
                     aspectRatio: 1,

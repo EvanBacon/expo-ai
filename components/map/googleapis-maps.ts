@@ -57,10 +57,9 @@ export async function getPlacesInfo(
   try {
     const response = await fetch(url);
     const data = await response.json();
-    console.log("Points of interest:", JSON.stringify(data));
     return data.results;
   } catch (error) {
     console.error("Error fetching points of interest:", error);
-    return null;
+    return [];
   }
 }

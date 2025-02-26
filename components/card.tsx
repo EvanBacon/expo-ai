@@ -39,6 +39,8 @@ export function CardHeader({
   );
 }
 
+const borderColor = process.env.EXPO_OS === "android" ? "transparent" : AC.separator;
+
 export function Card({
   style,
   title,
@@ -72,7 +74,7 @@ export function Card({
             overflow: "hidden",
             backgroundColor: "white",
             borderWidth: fillSpace ? 0 : 1,
-            borderColor: AC.separator,
+            borderColor,
           },
 
           style,

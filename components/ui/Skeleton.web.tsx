@@ -69,7 +69,7 @@ const Skeleton = ({
           left: 0,
           right: 0,
           bottom: 0,
-          background: `linear-gradient(90deg, transparent, ${dark.low}, transparent)`,
+          background: `linear-gradient(90deg, transparent, ${String(dark.low)}, transparent)`,
           animation: `shimmer 1.5s infinite linear ${delay || 0}ms`,
         }}
       />

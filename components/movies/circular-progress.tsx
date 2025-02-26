@@ -78,7 +78,6 @@ export const CircularProgressBar = ({
 
         {/* Background circle */}
         <Circle
-          //   opacity={1}
           opacity={0.3}
           stroke={primaryColor}
           fill="none"

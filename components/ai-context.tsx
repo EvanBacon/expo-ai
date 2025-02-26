@@ -9,6 +9,7 @@ import { openai } from "@ai-sdk/openai";
 import { WeatherCard } from "./weather";
 
 // Skeleton and display components
+import { nanoid } from "@/util/nanoid";
 import { unstable_headers } from "expo-router/rsc/headers";
 import { getPlacesInfo } from "./map/googleapis-maps";
 import { MapCard, MapSkeleton } from "./map/map-card";
@@ -55,8 +56,7 @@ export async function onSubmit(message: string) {
             ),
         })
         .required(),
-      async *generate({ poi }) {
-        console.log("city", poi);
+      async *generate({ poi }: { poi: string }) {
         // Show a spinner on the client while we wait for the response.
         yield <MapSkeleton />;
 
@@ -174,10 +174,8 @@ User info:
           .required(),
         async *generate({ city }) {
           yield <WeatherCard city={city} />;
-          // await new Promise((resolve) => setTimeout(resolve, 5000));
 
           const weatherInfo = await getWeatherAsync(city);
-          console.log("weatherInfo", JSON.stringify(weatherInfo));
           return <WeatherCard city={city} data={weatherInfo} />;
         },
       },
@@ -189,8 +187,6 @@ User info:
     display: result.value,
   };
 }
-
-const nanoid = () => Math.random().toString(36).slice(2);
 
 export type Message = CoreMessage & {
   id: string;

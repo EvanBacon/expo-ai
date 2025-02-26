@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useRef } from "react";
 import { AppState, StyleSheet } from "react-native";
-import { MapView, Marker, UrlTile } from "./map-view";
+import { MapView, Marker } from "./map-view";
 
 export const FlyoverMap = ({
   center,
@@ -52,7 +52,6 @@ export const FlyoverMap = ({
 
   useEffect(() => {
     if (mapRef.current && previousCenter.current !== center) {
-      console.log("animateCamera.1", center);
       clearInterval(interval.current);
       clearTimeout(animatingRef.current);
       previousCenter.current = center;
@@ -86,21 +85,13 @@ export const FlyoverMap = ({
       ref={mapRef}
       style={styles.map}
       mapType={isApple ? "standard" : "none"}
-      //   mapType="hybridFlyover"
       showsCompass={false}
       userInterfaceStyle="dark"
       onTouchStart={() => {
         clearInterval(interval.current);
       }}
-      // pitchEnabled={false}
-      // rotateEnabled={false}
-      // showsBuildings={false}
-      // showsIndoors={false}
       showsIndoorLevelPicker={false}
       showsMyLocationButton={false}
-      // showsPointsOfInterest={false}
-      // zoomEnabled={false}
-      // scrollEnabled={false}
       initialRegion={{
         latitude: center.latitude,
         longitude: center.longitude,
@@ -108,34 +99,6 @@ export const FlyoverMap = ({
         longitudeDelta: 0.0421,
       }}
     >
-      {!isApple && (
-        <UrlTile
-          urlTemplate="http://3.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png"
-          // urlTemplate="https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png"
-          zIndex={-1}
-          // Test steps:
-          // 1) Without new tile provider properties: comment out tileCachePath & maximumNativeZ
-          // 2) With maximumNativeZ only to test scaling past maxNativeZoom level
-          // 3) With doubleTileSize (only on Android)
-          // 4) With tileCachePath too - test caching performance with cutting & throttling network connectivity
-          // 5) With tileCacheMaxAge too
-          // 6) With offlineMode=true too - test zoom in to test scaling of lower zoom level tiles to higher zoom levels
-          //
-          maximumNativeZ={19}
-          // For testing activate different tile cache paths, examples below
-          // work for simulator / emulator testing
-          // This is for iOS simulator, both as fileURL and directory paths to be tested separately
-
-          //tileCachePath="/Users/suomimar/Library/Developer/CoreSimulator/tiles"
-          // This is for Android simulator, both as fileURL and directory paths to be tested separately
-          //tileCachePath="file:///data/user/0/com.airbnb.android.react.maps.example/files/tiles"
-          //tileCachePath="/data/user/0/com.airbnb.android.react.maps.example/files/tiles"
-          tileCacheMaxAge={20}
-          doubleTileSize={true}
-          opacity={1.0}
-        />
-      )}
-
       {process.env.EXPO_OS === "web" && (
         <Marker
           coordinate={center}
@@ -156,8 +119,6 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
-    // pointerEvents: 'none',
-    // backgroundColor: 'black',
   },
   button: {
     backgroundColor: "rgba(255, 255, 255, 0.7)",

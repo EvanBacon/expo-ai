@@ -18,7 +18,7 @@ export default function Movie() {
     <BodyScrollView>
       <Stack.Screen
         options={{
-          title: "Movie",
+          title: media_type === "movie" ? "Movie" : "TV Show",
           headerTransparent: false,
         }}
       />

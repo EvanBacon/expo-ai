@@ -29,7 +29,6 @@ export function MovieTouchable({
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         }
 
-        console.log("Push:", movie.id, movie.media_type);
         router.push({
           pathname: "/movie/[id]",
           params: { id: movie.id, media_type: movie.media_type },

@@ -45,7 +45,7 @@ export function MapCard({
             longitude: point.geometry.location.lng,
             // Address
             address: point.formatted_address,
-            isOpen: point.opening_hours?.open_now,
+            isOpen: point.opening_hours?.open_now ?? false,
             userRatingsTotal: point.user_ratings_total,
             userRating: point.rating,
           }))}

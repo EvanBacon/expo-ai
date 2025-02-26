@@ -10,7 +10,9 @@ export default function Layout() {
     <Stack
       screenOptions={{
         title: "Movies",
+        // @ts-expect-error
         headerTintColor: AC.label,
+        // @ts-expect-error
         headerLargeStyle: {
           backgroundColor: AC.systemGroupedBackground,
         },

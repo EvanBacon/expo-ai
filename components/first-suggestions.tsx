@@ -6,6 +6,12 @@ import { tw } from "@/util/tw";
 import * as AC from "@bacons/apple-colors";
 import { PromptOnTap } from "./prompt-on-tap";
 
+const suggestions = [
+  "What's the weather",
+  process.env.EXPO_OS !== "web" && "Things to do around me",
+  "Trending movies this week",
+].filter(Boolean) as string[];
+
 export function FirstSuggestions() {
   return (
     <View
@@ -16,14 +22,7 @@ export function FirstSuggestions() {
         paddingHorizontal: 16,
       }}
     >
-      {(
-        [
-          // ['server rendering apps', 'for native platforms'],
-          "What's the weather",
-          process.env.EXPO_OS !== "web" && "Things to do around me",
-          "Trending movies this week",
-        ].filter(Boolean) as string[]
-      ).map((title, index) => (
+      {suggestions.map((title, index) => (
         <Animated.View
           entering={FadeInDown.delay((3 - index) * 100)}
           key={String(index)}
@@ -44,7 +43,6 @@ export function FirstSuggestions() {
                 style={{
                   color: AC.label,
                   fontSize: 16,
-                  // fontWeight: "bold",
                 }}
               >
                 {title}

@@ -4,13 +4,44 @@ import ShowMore from "@/components/ui/ShowMore";
 import * as AC from "@bacons/apple-colors";
 import { Stack } from "expo-router";
 import { Image, Text, View } from "react-native";
+import { z } from "zod";
+
+const PersonDetailsSchema = z.object({
+  name: z.string(),
+  profile_path: z.string().nullish(),
+  known_for_department: z.string().nullish(),
+  biography: z.string(),
+  birthday: z.string().nullish(),
+  deathday: z.string().nullish(),
+  place_of_birth: z.string().nullish(),
+});
 
 export async function renderPersonDetails(id: string) {
   // Fetch person details
   const response = await fetch(
     `https://api.themoviedb.org/3/person/${id}?api_key=${process.env.TMDB_API_KEY}`
   );
-  const person = await response.json();
+  const rawData = await response.json();
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch person details`);
+  }
+
+  const person = PersonDetailsSchema.parse(rawData);
+
+  const dates = [
+    person.birthday && {
+      label: "Born",
+      value: `${new Date(person.birthday).toLocaleDateString()}${
+        person.place_of_birth ? ` in ${person.place_of_birth}` : ""
+      }`,
+    },
+    person.deathday && {
+      label: "Died",
+      value: new Date(person.deathday).toLocaleDateString(),
+    },
+  ]
+    .filter(Boolean) as { label: string; value: string }[];
 
   return (
     <View style={{ flex: 1 }}>
@@ -35,7 +66,6 @@ export async function renderPersonDetails(id: string) {
             }}
           >
             <Image
-              transition={200}
               source={{
                 uri: `https://image.tmdb.org/t/p/original${person.profile_path}`,
               }}
@@ -102,20 +132,7 @@ export async function renderPersonDetails(id: string) {
             marginBottom: 16,
           }}
         >
-          {[
-            person.birthday && {
-              label: "Born",
-              value: `${new Date(person.birthday).toLocaleDateString()}${
-                person.place_of_birth ? ` in ${person.place_of_birth}` : ""
-              }`,
-            },
-            person.deathday && {
-              label: "Died",
-              value: new Date(person.deathday).toLocaleDateString(),
-            },
-          ]
-            .filter(Boolean)
-            .map((item, index, array) => (
+          {dates.map((item, index, array) => (
               <View
                 key={item.label}
                 style={{

@@ -12,13 +12,12 @@ import { useColorScheme } from "react-native";
 const BaconDefaultTheme: Theme = {
   dark: false,
   colors: {
-    // ...DefaultTheme.colors,
-    primary: AC.systemBlue,
-    background: AC.systemGroupedBackground,
-    card: AC.secondarySystemGroupedBackground,
-    text: AC.label,
-    border: AC.separator,
-    notification: AC.systemRed,
+    primary: AC.systemBlue as unknown as string,
+    background: AC.systemGroupedBackground as unknown as string,
+    card: AC.secondarySystemGroupedBackground as unknown as string,
+    text: AC.label as unknown as string,
+    border: AC.separator as unknown as string,
+    notification: AC.systemRed as unknown as string,
   },
   fonts: DefaultTheme.fonts,
 };

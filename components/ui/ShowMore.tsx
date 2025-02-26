@@ -1,7 +1,7 @@
 "use client";
 
 import * as AC from "@bacons/apple-colors";
-import { useState } from "react";
+import React, { useState } from "react";
 import { LayoutAnimation, Text, TouchableOpacity } from "react-native";
 
 LayoutAnimation.easeInEaseOut();

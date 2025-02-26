@@ -10,37 +10,33 @@ import {
 } from "mapkit-react";
 import React from "react";
 
-export const MapView = ({
-  style,
+interface Ref {
+  setCamera: (camera: Camera) => void;
+  animateCamera: (camera: Partial<Camera>, __opts?: { duration?: number }) => void;
+}
+
+export const MapView = React.forwardRef<
+  Ref,
+  Omit<React.ComponentProps<typeof NativeMapView>, 'ref'>
+>(({
   userInterfaceStyle,
-  pitchEnabled,
   rotateEnabled,
   scrollEnabled,
   zoomEnabled,
   initialRegion,
-  showsBuildings,
   showsCompass,
-  showsIndoorLevelPicker,
-  showsIndoors,
-  showsMyLocationButton,
   showsPointsOfInterest,
   showsScale,
   showsUserLocation,
-  showsTraffic,
-  ref,
-}: React.ComponentProps<typeof NativeMapView>) => {
+}, ref) => {
   if (!process.env.EXPO_PUBLIC_APPLE_MAPKIT_JS_KEY) {
     throw new Error("Missing process.env.EXPO_PUBLIC_APPLE_MAPKIT_JS_KEY");
   }
 
   const mapRef = React.useRef<mapkit.Map>(null);
 
-  // const animateCamera: (camera: Partial<Camera>, opts?: {
-  //     duration?: number;
-  // }): void;
   const animateCamera = React.useCallback(
-    (camera: Partial<Camera>, opts?: { duration?: number }) => {
-      console.log("animateCamera", camera);
+    (camera: Partial<Camera>, __opts?: { duration?: number }) => {
       if (mapRef.current) {
         if (camera.zoom) {
           mapRef.current.setCameraZoomRangeAnimated(
@@ -70,7 +66,6 @@ export const MapView = ({
 
   const setCamera = React.useCallback(
     (camera: Camera) => {
-      console.log("setCamera", camera);
       if (mapRef.current) {
         if (camera.zoom) {
           mapRef.current.setCameraZoomRangeAnimated(
@@ -94,8 +89,6 @@ export const MapView = ({
 
           false
         );
-        // mapRef.current.setRegionAnimated
-        // mapRef.current.setCameraBoundary(camera);
       }
     },
     [mapRef]
@@ -142,14 +135,12 @@ export const MapView = ({
       <AppleMarker latitude={46.52} longitude={6.57} />
     </Map>
   );
-};
+});
 
 MapView.displayName = "MapView";
 
 export function Marker({
   coordinate,
-  focusable,
-  isTVSelectable,
   tappable,
 }: React.ComponentProps<typeof import("react-native-maps").Marker>) {
   return (
@@ -159,8 +150,4 @@ export function Marker({
       enabled={tappable}
     />
   );
-}
-
-export function UrlTile() {
-  return <></>;
 }

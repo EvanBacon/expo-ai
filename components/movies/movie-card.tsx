@@ -2,7 +2,7 @@ import { Card } from "@/components/card";
 import Skeleton from "@/components/ui/Skeleton";
 import { tw } from "@/util/tw";
 import React from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { Image, ImageStyle, ScrollView, Text, View } from "react-native";
 import { CircularProgressBar } from "./circular-progress";
 import { MovieTouchable } from "./movie-client-components";
 import { MovieEntry } from "./movies-data";
@@ -108,7 +108,7 @@ function MovieCard({
               overflow: "hidden",
               borderRadius: 8,
             },
-            tw`transition-transform hover:scale-95`,
+            tw`transition-transform hover:scale-95` as ImageStyle,
           ]}
         />
 
