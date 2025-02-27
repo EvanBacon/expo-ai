@@ -8,7 +8,7 @@ import * as Form from "@/components/ui/Form";
 import * as AC from "@bacons/apple-colors";
 import Constants from "expo-constants";
 import { Stack } from "expo-router";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Text, View } from "react-native";
 
 import * as Clipboard from "expo-clipboard";
@@ -116,9 +116,11 @@ export default function DebugRoute() {
               try {
                 const response = await pingServer();
                 alert(response);
-              } catch (error) {
-                setError(error);
-                alert(`Error: ${error}`);
+              } catch (error: unknown) {
+                if (error instanceof Error) {
+                  setError(error);
+                  alert(`Error: ${error}`);
+                }
               }
             }}
           >
@@ -130,9 +132,11 @@ export default function DebugRoute() {
             onPress={async () => {
               try {
                 await pingServerError();
-              } catch (error) {
-                setError(error);
-                alert(`Error: ${error}`);
+              } catch (error: unknown) {
+                if (error instanceof Error) {
+                  setError(error);
+                  alert(`Error: ${error}`);
+                }
               }
             }}
           >
@@ -148,9 +152,11 @@ export default function DebugRoute() {
             onPress={async () => {
               try {
                 setHeaders(await getRequestHeaders());
-              } catch (error: any) {
-                setError(error);
-                alert(`Error: ${error}`);
+              } catch (error: unknown) {
+                if (error instanceof Error) {
+                  setError(error);
+                  alert(`Error: ${error}`);
+                }
               }
             }}
           >
@@ -163,13 +169,6 @@ export default function DebugRoute() {
           )}
         </Form.Section>
 
-        {/* <Form.Section title="Manifest">
-          <View>
-            <Form.Text>
-              {JSON.stringify(Constants.expoConfig, null, 2)}
-            </Form.Text>
-          </View>
-        </Form.Section> */}
       </BodyScrollView>
 
       <Stack.Screen options={{ title: "Debug" }} />

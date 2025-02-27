@@ -2,7 +2,7 @@
 
 import * as AC from "@bacons/apple-colors";
 import * as Haptics from "expo-haptics";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import Markdown from "react-native-markdown-display";
 
 export default function MarkdownText({

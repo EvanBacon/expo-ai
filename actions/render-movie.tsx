@@ -3,11 +3,46 @@
 import { FadeIn } from "@/components/ui/FadeIn";
 import TouchableBounce from "@/components/ui/TouchableBounce";
 import { tw } from "@/util/tw";
-import { label, secondarySystemGroupedBackground } from "@bacons/apple-colors";
+import * as AC from "@bacons/apple-colors";
 import { ErrorBoundary, Link, Stack } from "expo-router";
 import { Try } from "expo-router/build/views/Try";
 import React from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { Image, ImageStyle, ScrollView, Text, View } from "react-native";
+import { z } from "zod";
+
+const label = process.env.EXPO_OS === "android" ? "rgba(0, 0, 0, 1)" : AC.label;
+const secondarySystemGroupedBackground = process.env.EXPO_OS === "android" ? "rgba(255, 255, 255, 1)" : AC.secondarySystemGroupedBackground;
+
+const PersonSchema = z.object({
+  id: z.number(),
+  name: z.string().nullish(),
+  profile_path: z.string().nullish(),
+  character: z.string().nullish(),
+});
+
+const MediaSchema = z.object({
+  id: z.number(),
+  title: z.string().nullish(),
+  name: z.string().nullish(),
+  poster_path: z.string().nullish(),
+  backdrop_path: z.string().nullish(),
+  vote_average: z.number().nullish(),
+  tagline: z.string().nullish(),
+  overview: z.string().nullish(),
+  adult: z.boolean().nullish(),
+  release_date: z.string().nullish(),
+  first_air_date: z.string().nullish(),
+  runtime: z.number().nullish(),
+  episode_run_time: z.array(z.number()).nullish(),
+  budget: z.number().nullish(),
+  revenue: z.number().nullish(),
+  production_countries: z.array(z.object({ name: z.string() })).nullish(),
+  spoken_languages: z.array(z.object({ name: z.string() })).nullish(),
+  genres: z.array(z.object({ name: z.string() })).nullish(),
+});
+
+type Person = z.infer<typeof PersonSchema>;
+type Media = z.infer<typeof MediaSchema>;
 
 type MediaType = "movie" | "tv";
 
@@ -22,21 +57,11 @@ export async function renderMedia(id: string, type: MediaType = "movie") {
 
       <MediaDetails id={id} type={type} />
 
-      {/* <React.Suspense fallback={<ListSkeleton />}>
-        <MediaVideos id={id} type={type} />
-      </React.Suspense> */}
-
       <Try catch={ErrorBoundary}>
         <React.Suspense fallback={<ListSkeleton />}>
           <MediaCast id={id} type={type} />
         </React.Suspense>
       </Try>
-
-      {/* <Try catch={ErrorBoundary}>
-        <React.Suspense fallback={<ListSkeleton />}>
-          <MediaCompanies id={id} type={type} />
-        </React.Suspense>
-      </Try> */}
 
       <Try catch={ErrorBoundary}>
         <React.Suspense fallback={<ListSkeleton />}>
@@ -123,24 +148,7 @@ function MediaHero({ media, type }: { media: any; type: MediaType }) {
   );
 }
 
-function VideoCard({ video }: { video: any }) {
-  return (
-    <View style={{ width: 280, marginHorizontal: 4 }}>
-      <Image
-        source={{ uri: `https://img.youtube.com/vi/${video.key}/0.jpg` }}
-        style={{ width: "100%", height: 157, borderRadius: 8 }}
-      />
-      <Text
-        style={{ fontSize: 14, color: label, marginTop: 4 }}
-        numberOfLines={1}
-      >
-        {video.name}
-      </Text>
-    </View>
-  );
-}
-
-function CastCard({ person }: { person: any }) {
+function CastCard({ person }: { person: Person }) {
   return (
     <Link href={`/movie/actor/${person.id}`} asChild>
       <TouchableBounce
@@ -160,7 +168,7 @@ function CastCard({ person }: { person: any }) {
               borderRadius: 8,
               backgroundColor: secondarySystemGroupedBackground,
             },
-            tw`transition-transform hover:scale-95`,
+            tw`transition-transform hover:scale-95` as ImageStyle,
           ]}
         />
         <Text
@@ -180,33 +188,7 @@ function CastCard({ person }: { person: any }) {
   );
 }
 
-function CompanyCard({ company }: { company: any }) {
-  return (
-    <View style={{ alignItems: "center", marginHorizontal: 8, width: 100 }}>
-      {company.logo_path && (
-        <Image
-          source={{
-            uri: `https://image.tmdb.org/t/p/w200${company.logo_path}`,
-          }}
-          style={{ width: 80, height: 80, resizeMode: "contain" }}
-        />
-      )}
-      <Text
-        style={{
-          fontSize: 12,
-          color: label,
-          textAlign: "center",
-          marginTop: 4,
-        }}
-        numberOfLines={2}
-      >
-        {company.name}
-      </Text>
-    </View>
-  );
-}
-
-function MediaCard({ media, type }: { media: any; type: MediaType }) {
+function MediaCard({ media, type }: { media: Media; type: MediaType }) {
   return (
     <Link
       href={{
@@ -235,7 +217,7 @@ function MediaCard({ media, type }: { media: any; type: MediaType }) {
             {type === "movie" ? media.title : media.name}
           </Text>
           <Text style={{ fontSize: 12, color: label, opacity: 0.7 }}>
-            ★ {media.vote_average.toFixed(1)}
+            ★ {media.vote_average?.toFixed(1) || "N/A"}
           </Text>
         </View>
       </TouchableBounce>
@@ -247,18 +229,20 @@ async function MediaDetails({ id, type }: { id: string; type: MediaType }) {
   const response = await fetch(
     `https://api.themoviedb.org/3/${type}/${id}?api_key=${process.env.TMDB_API_KEY}`
   );
-  const media = await response.json();
+  const rawData = await response.json();
 
   if (!response.ok) {
-    console.log(response.text());
     throw new Error(`Failed to fetch ${type}`);
   }
+
+  const media = MediaSchema.parse(rawData);
+  const releaseDate = type === "movie" ? media.release_date : media.first_air_date;
 
   return (
     <>
       <Stack.Screen
         options={{
-          title: type === "movie" ? media.title : media.name,
+          title: (type === "movie" ? media.title : media.name) || "",
         }}
       />
 
@@ -295,9 +279,7 @@ async function MediaDetails({ id, type }: { id: string; type: MediaType }) {
             {[
               {
                 label: type === "movie" ? "Release Date" : "First Air Date",
-                value: new Date(
-                  type === "movie" ? media.release_date : media.first_air_date
-                ).toLocaleDateString(),
+                value: releaseDate ? new Date(releaseDate).toLocaleDateString() : "N/A",
               },
               {
                 label: "Age Rating",
@@ -324,21 +306,21 @@ async function MediaDetails({ id, type }: { id: string; type: MediaType }) {
               },
               {
                 label: "Countries",
-                value: media.production_countries
+                value: (media.production_countries || [])
                   .map((c: { name: string }) => c.name)
-                  .join(", "),
+                  .join(", ") || "N/A",
               },
               {
                 label: "Languages",
-                value: media.spoken_languages
+                value: (media.spoken_languages || [])
                   .map((l: { name: string }) => l.name)
-                  .join(", "),
+                  .join(", ")
               },
               {
                 label: "Genres",
-                value: media.genres
+                value: (media.genres || [])
                   .map((g: { name: string }) => g.name)
-                  .join(", "),
+                  .join(", ") || "N/A",
               },
             ].map((item, index, array) => (
               <View
@@ -368,34 +350,19 @@ async function MediaDetails({ id, type }: { id: string; type: MediaType }) {
   );
 }
 
-async function MediaVideos({ id, type }: { id: string; type: MediaType }) {
-  const response = await fetch(
-    `https://api.themoviedb.org/3/${type}/${id}/videos?api_key=${process.env.TMDB_API_KEY}`
-  );
-  const videos = await response.json();
-
-  if (!videos.results.length) return null;
-
-  console.log(videos);
-
-  return (
-    <HorizontalList title="Teasers & Trailers">
-      {videos.results.map((video: any) => (
-        <VideoCard key={video.key} video={video} />
-      ))}
-    </HorizontalList>
-  );
-}
-
 async function MediaCast({ id, type }: { id: string; type: MediaType }) {
   const response = await fetch(
     `https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${process.env.TMDB_API_KEY}`
   );
-  const credits = await response.json();
+  const rawData = await response.json();
+  
+  const credits = z.object({
+    cast: z.array(PersonSchema),
+  }).parse(rawData);
 
   return (
     <HorizontalList title="Cast & Crew">
-      {credits.cast.slice(0, 10).map((person: any) => (
+      {credits.cast.slice(0, 10).map((person) => (
         <CastCard key={person.id} person={person} />
       ))}
     </HorizontalList>
@@ -406,11 +373,15 @@ async function SimilarMedia({ id, type }: { id: string; type: MediaType }) {
   const response = await fetch(
     `https://api.themoviedb.org/3/${type}/${id}/similar?api_key=${process.env.TMDB_API_KEY}`
   );
-  const similar = await response.json();
+  const rawData = await response.json();
+
+  const similar = z.object({
+    results: z.array(MediaSchema),
+  }).parse(rawData);
 
   return (
     <HorizontalList title="More Like This">
-      {similar.results.slice(0, 10).map((media: any) => (
+      {similar.results.slice(0, 10).map((media) => (
         <MediaCard key={media.id} media={media} type={type} />
       ))}
     </HorizontalList>

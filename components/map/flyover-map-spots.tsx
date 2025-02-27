@@ -2,7 +2,7 @@
 
 import { BlurView } from "expo-blur";
 import { useEffect, useRef, useState } from "react";
-import { Linking, Platform, ScrollView, Text, View } from "react-native";
+import { Linking, NativeScrollEvent, NativeSyntheticEvent, Platform, ScrollView, Text, View } from "react-native";
 
 import { FlyoverMap } from "@/components/map/flyover-map";
 import TouchableBounce from "@/components/ui/TouchableBounce";
@@ -14,13 +14,13 @@ const useWebOnScroll = ({
   onScroll,
   onScrollEnd,
 }: {
-  onScroll: React.ComponentProps<typeof ScrollView>["onScroll"];
-  onScrollEnd: () => void;
+  onScroll?: React.ComponentProps<typeof ScrollView>["onScroll"];
+  onScrollEnd: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
 }) => {
-  const lastScrollEvent = useRef(null);
-  const scrollEndTimeout = useRef(null);
+  const lastScrollEvent = useRef<number | null>(null);
+  const scrollEndTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  const handleWebScroll = (event) => {
+  const handleWebScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     onScroll?.(event);
 
     const timestamp = Date.now();
@@ -69,23 +69,18 @@ export function FlyoverCard({
 }) {
   const [location, setLocation] = useState(locations[0]);
   const [width, setWidth] = useState(0);
-  // const [aiState, setAIState] = useAIState<typeof AI>();
-  // const [messages, setMessages] = useUIState<typeof AI>();
 
   const handleWebScroll = useWebOnScroll({
     onScrollEnd(event) {
       if (process.env.EXPO_OS !== "web") return;
-      console.log("onScrollAnimationEnd", event.nativeEvent);
       const index = Math.round(event.nativeEvent.contentOffset.x / width);
       const nextLocation = locations[index];
-      console.log(nextLocation.title);
       if (nextLocation.title !== location.title) {
         setLocation(nextLocation);
       }
     },
   });
 
-  // const id = useId();
   return (
     <View
       onLayout={(event) => {
@@ -97,7 +92,6 @@ export function FlyoverCard({
         maxHeight: 400,
       }}
     >
-      {/* {location && <View style={{ flex: 1, backgroundColor: "blue" }} />} */}
       {location && (
         <FlyoverMap
           center={location}
@@ -120,7 +114,6 @@ export function FlyoverCard({
         onMomentumScrollEnd={(event) => {
           const index = Math.round(event.nativeEvent.contentOffset.x / width);
           const nextLocation = locations[index];
-          console.log(nextLocation.title);
           if (nextLocation.title !== location.title) {
             setLocation(nextLocation);
           }

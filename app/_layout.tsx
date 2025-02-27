@@ -26,6 +26,7 @@ export default function Layout() {
         <Stack.Screen
           name="index"
           options={{
+            // @ts-expect-error
             headerLargeStyle: {
               backgroundColor: AC.systemGroupedBackground,
             },
@@ -59,8 +60,9 @@ export default function Layout() {
           options={{
             headerTransparent: false,
 
+            // @ts-expect-error
             headerLargeStyle: {
-              backgroundColor: AC.systemGroupedBackground,
+              backgroundColor: AC.systemGroupedBackground
             },
             presentation: "modal",
           }}
@@ -103,9 +105,6 @@ export default function Layout() {
           name="settings/icon"
           sheet
           options={{
-            // headerLargeStyle: {
-            //   backgroundColor: AC.systemGroupedBackground,
-            // },
             // Quarter sheet with no pulling allowed
             headerTransparent: false,
             sheetGrabberVisible: false,

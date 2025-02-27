@@ -39,8 +39,6 @@ export function KeyboardFriendlyScrollView({
   });
 
   const scrollToBottom = useCallback(() => {
-    // console.log('scroll');
-
     timeout.current && clearTimeout(timeout.current);
     timeout.current = setTimeout(() => {
       ref.current?.scrollToEnd({ animated: true });
@@ -79,7 +77,6 @@ export function KeyboardFriendlyScrollView({
         lastKeyboardState.value !== keyboard.state.value &&
         keyboard.state.value === KeyboardState.OPEN
       ) {
-        // console.log('open without input');
         scrollTo(
           ref,
           0,

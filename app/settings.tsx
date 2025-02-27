@@ -1,5 +1,6 @@
 import * as Form from "@/components/ui/Form";
 import * as AC from "@bacons/apple-colors";
+import React from "react";
 
 import { IconSymbol } from "@/components/ui/IconSymbol";
 

@@ -79,7 +79,7 @@ export function FormItem({
   href,
   onPress,
   ...props
-}: Pick<ViewProps, "children"> & { href?: Href<any>; onPress?: () => void }) {
+}: Pick<ViewProps, "children"> & { href?: Href; onPress?: () => void }) {
   if (href == null) {
     if (onPress == null) {
       return (
@@ -366,10 +366,11 @@ export function Section({
             return null;
           }
           if (typeof linkChild === "string") {
+            const props = child && typeof child === 'object' && 'props' in child ? child.props : {};
             return (
               <RNText
                 dynamicTypeRamp="body"
-                style={mergedStyles(FormFont.default, child.props)}
+                style={mergedStyles(FormFont.default, props)}
               >
                 {linkChild}
               </RNText>
@@ -420,6 +421,7 @@ export function Section({
       })();
 
       child = React.cloneElement(child, {
+        // @ts-expect-error
         style: [
           FormFont.default,
           process.env.EXPO_OS === "web" && {
@@ -492,8 +494,6 @@ export function Section({
             paddingHorizontal: 20,
             paddingVertical: 8,
             fontSize: 14,
-            // use Apple condensed font
-            // fontVariant: ["small-caps"],
           }}
         >
           {title}
@@ -517,9 +517,11 @@ export function Section({
   );
 }
 
+const EXTERNAL_URL_REGEX = /^([\w\d_+.-]+:)?\/\//;
+
 function LinkChevronIcon({ href }: { href?: any }) {
   const isHrefExternal =
-    typeof href === "string" && /^([\w\d_+.-]+:)?\/\//.test(href);
+    typeof href === "string" && EXTERNAL_URL_REGEX.test(href);
 
   const size = process.env.EXPO_OS === "ios" ? 14 : 24;
   if (isHrefExternal) {
@@ -528,9 +530,6 @@ function LinkChevronIcon({ href }: { href?: any }) {
         name="arrow.up.right"
         size={size}
         weight="bold"
-        // from xcode, not sure which color is the exact match
-        // #BFBFBF
-        // #9D9DA0
         color={AppleColors.tertiaryLabel}
       />
     );
@@ -540,9 +539,6 @@ function LinkChevronIcon({ href }: { href?: any }) {
       name="chevron.right"
       size={size}
       weight="bold"
-      // from xcode, not sure which color is the exact match
-      // #BFBFBF
-      // #9D9DA0
       color={AppleColors.tertiaryLabel}
     />
   );
@@ -553,15 +549,18 @@ function Separator() {
     <View
       style={{
         marginStart: 60,
-        borderBottomWidth: 0.5, //StyleSheet.hairlineWidth,
-        marginTop: -0.5, // -StyleSheet.hairlineWidth,
+        borderBottomWidth: 0.5,
+        marginTop: -0.5,
         borderBottomColor: AppleColors.separator,
       }}
     />
   );
 }
 
-function mergedStyles(style: ViewStyle | TextStyle, props: any) {
+function mergedStyles<TStyle extends ViewStyle | TextStyle>(
+  style: TStyle,
+  props: any
+): StyleProp<TStyle> {
   if (props.style == null) {
     return style;
   } else if (Array.isArray(props.style)) {

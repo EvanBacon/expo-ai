@@ -61,8 +61,10 @@ function MyModalStackNavigator({
     useNavigationBuilder<
       StackNavigationState<ParamListBase>,
       MyModalStackRouterOptions,
-      MyModalStackNavigationOptions
-    >(StackRouter, {
+      {},
+      {},
+      {}
+     >(StackRouter, {
       children,
       screenOptions,
       initialRouteName,
@@ -135,6 +137,7 @@ function MyModalStackView({
       <NativeStackView
         state={newStackState}
         navigation={navigation}
+        // @ts-expect-error
         descriptors={descriptors}
       />
 
@@ -194,8 +197,8 @@ function MyModalStackView({
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          backgroundColor:
-                            AC.systemGroupedBackground as unknown as string,
+                          // @ts-expect-error
+                          backgroundColor: AC.systemGroupedBackground,
                         }}
                       >
                         <div
@@ -203,7 +206,8 @@ function MyModalStackView({
                             width: 36,
                             height: 4,
                             borderRadius: 2,
-                            backgroundColor: AC.separator as unknown as string,
+                            // @ts-expect-error
+                            backgroundColor: AC.separator,
                           }}
                         />
                       </div>
